@@ -12,12 +12,6 @@ export type Product = {
   tone: string;
 };
 
-export const siteAssets = {
-  logo: '/images/logo/red-t-logo.png',
-  hero: '/images/products/product-04.jpg',
-  featured: '/images/products/product-02.jpg',
-} as const;
-
 export const categories = [
   'الكل',
   '🚗 منتجات السيارات',

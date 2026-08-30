@@ -6,18 +6,17 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { categories, products, siteAssets, type Product } from '@/data/products';
+import { content, WHATSAPP_NUMBER } from '@/data/content';
+import { categories, products, type Product } from '@/data/products';
 
 const queryClient = new QueryClient();
-// Replace this one value with the brand's WhatsApp number in international format.
-const WHATSAPP_NUMBER = '966500000000';
 const trendingProducts = products.filter((product) => product.trending);
 const bestSellerProducts = products.filter((product) => product.bestSeller);
 
 function whatsappHref(product?: Product) {
   const message = product
-    ? `مرحباً، أريد طلب المنتج: ${product.name}`
-    : 'مرحباً، أريد معرفة المنتجات المتاحة لدى red-t.';
+    ? `${content.whatsapp.productMessagePrefix} ${product.name}`
+    : content.whatsapp.genericMessage;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -31,7 +30,7 @@ function WhatsAppButton({ product, dark = false }: { product?: Product; dark?: b
       className={`inline-flex items-center justify-center gap-3 rounded-full px-5 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${dark ? 'bg-[#f2efe8] text-[#171516] hover:bg-[#d20b18] hover:text-[#f2efe8]' : 'bg-[#d20b18] text-[#f2efe8] hover:bg-[#171516]'}`}
     >
       <MessageCircle size={17} strokeWidth={1.8} />
-      <span>{product ? 'اطلب عبر واتساب' : 'تحدث معنا الآن'}</span>
+      <span>{product ? content.whatsapp.productButton : content.whatsapp.genericButton}</span>
     </a>
   );
 }
@@ -40,7 +39,7 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <a href="#top" className={`flex items-center gap-2 ${compact ? 'scale-90 origin-right' : ''}`} data-testid="link-brand-home">
       <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[3px] bg-[#f7f6f3]">
-        <img src={siteAssets.logo} alt="red-t الشعار" className="h-full w-full object-contain" />
+        <img src={content.logoPath} alt="red-t الشعار" className="h-full w-full object-contain" />
       </span>
     </a>
   );
@@ -48,25 +47,18 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
 
 function Nav() {
   const [open, setOpen] = useState(false);
-  const links = [
-    ['الرئيسية', '#top'],
-    ['الأكثر رواجاً', '#trending'],
-    ['الأكثر مبيعاً', '#bestsellers'],
-    ['الأصناف', '#categories'],
-    ['تواصل معنا', '#contact'],
-  ];
   return (
     <header className="absolute inset-x-0 top-0 z-30">
       <div className="mx-auto flex h-[74px] max-w-[1320px] items-center justify-between px-5 sm:px-8 lg:px-12" dir="rtl">
         <BrandMark />
         <nav className="hidden items-center gap-9 md:flex">
-          {links.map(([label, href]) => (
+          {content.navigation.map(({ label, href }) => (
             <a key={href} href={href} className="nav-link text-[13px] font-medium text-[#f2efe8]/75 hover:text-[#f2efe8]" data-testid={`link-nav-${label}`}>{label}</a>
           ))}
         </nav>
         <div className="hidden items-center gap-5 md:flex">
           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[#f2efe8]/70 transition hover:text-[#f2efe8]" data-testid="link-instagram"><Instagram size={18} /></a>
-          <a href="#products" className="rounded-full border border-[#f2efe8]/30 px-5 py-2.5 text-[12px] font-semibold text-[#f2efe8] transition hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid="link-browse-products">استكشف المجموعة</a>
+          <a href="#products" className="rounded-full border border-[#f2efe8]/30 px-5 py-2.5 text-[12px] font-semibold text-[#f2efe8] transition hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid="link-browse-products">{content.hero.ctaText}</a>
         </div>
         <button onClick={() => setOpen(!open)} className="text-[#f2efe8] md:hidden" aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'} data-testid="button-mobile-menu">
           {open ? <X size={25} /> : <Menu size={25} />}
@@ -75,7 +67,7 @@ function Nav() {
       {open && (
         <div className="mx-4 border-t border-[#f2efe8]/15 bg-[#171516] px-5 py-5 md:hidden" dir="rtl">
           <div className="flex flex-col gap-5">
-            {links.map(([label, href]) => <a key={href} href={href} onClick={() => setOpen(false)} className="text-sm text-[#f2efe8]/80" data-testid={`link-mobile-${label}`}>{label}</a>)}
+            {content.navigation.map(({ label, href }) => <a key={href} href={href} onClick={() => setOpen(false)} className="text-sm text-[#f2efe8]/80" data-testid={`link-mobile-${label}`}>{label}</a>)}
             <WhatsAppButton />
           </div>
         </div>
@@ -122,31 +114,31 @@ function Home() {
         <div className="hero-grid absolute inset-0 opacity-50" />
         <div className="absolute -left-16 top-24 h-[420px] w-[420px] rounded-full bg-[#d20b18]/20 blur-[100px]" />
         <div className="absolute inset-0 opacity-50 lg:right-[47%]">
-            <img src={siteAssets.hero} alt="سيارة في مشهد حضري ليلي" fetchPriority="high" className="h-full w-full object-cover object-center mix-blend-screen opacity-60" />
+            <img src={content.hero.image} alt="سيارة في مشهد حضري ليلي" fetchPriority="high" className="h-full w-full object-cover object-center mix-blend-screen opacity-60" />
         </div>
         <div className="relative mx-auto flex min-h-[700px] max-w-[1320px] items-end px-5 pb-14 pt-28 sm:px-8 lg:min-h-[790px] lg:px-12 lg:pb-20">
           <div className="relative z-10 max-w-[740px]">
             <div className="reveal mb-8 flex h-14 w-14 items-center justify-center overflow-hidden rounded-[3px] bg-[#f7f6f3]">
-              <img src={siteAssets.logo} alt="red-t الشعار" className="h-full w-full object-contain" data-testid="img-hero-logo" />
+              <img src={content.logoPath} alt="red-t الشعار" className="h-full w-full object-contain" data-testid="img-hero-logo" />
             </div>
             <div className="reveal mb-7 flex items-center gap-3">
               <span className="h-[1px] w-12 bg-[#d20b18]" />
-              <span className="font-mono text-[10px] tracking-[.16em] text-[#f2efe8]/65">EST. 2024 / RIYADH</span>
+              <span className="font-mono text-[10px] tracking-[.16em] text-[#f2efe8]/65">{content.hero.eyebrow}</span>
             </div>
             <h1 className="reveal reveal-delay-1 display-tight font-display text-[70px] font-bold sm:text-[110px] lg:text-[155px]">
-              <span className="block">اكتشف منتجاتك</span>
-              <span className="block text-[#d20b18]">المفضلة.</span>
+              <span className="block">{content.hero.headline[0]}</span>
+              <span className="block text-[#d20b18]">{content.hero.headline[1]}</span>
             </h1>
             <div className="reveal reveal-delay-2 mt-9 flex max-w-[500px] flex-col items-start gap-7 sm:flex-row sm:items-end">
-              <p className="max-w-[300px] text-[15px] leading-8 text-[#f2efe8]/70">قطع مختارة لمن يعيشون التفاصيل. ملابس، إكسسوارات، وأساسيات ترافقك من أول تشغيل إلى آخر محطة.</p>
+              <p className="max-w-[300px] text-[15px] leading-8 text-[#f2efe8]/70">{content.hero.description}</p>
               <a href="#products" className="group flex shrink-0 items-center gap-3 text-[13px] font-semibold text-[#f2efe8]" data-testid="link-hero-catalog">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#f2efe8]/35 transition group-hover:border-[#d20b18] group-hover:bg-[#d20b18]"><ArrowLeft size={17} /></span>
-                تصفح المنتجات
+                {content.hero.ctaText}
               </a>
             </div>
           </div>
           <div className="absolute bottom-12 left-5 hidden items-center gap-3 lg:flex">
-            <span className="font-mono text-[10px] tracking-widest text-[#f2efe8]/50">SCROLL TO EXPLORE</span>
+            <span className="font-mono text-[10px] tracking-widest text-[#f2efe8]/50">{content.hero.scrollLabel}</span>
             <span className="h-12 w-px bg-[#f2efe8]/30" />
           </div>
         </div>
@@ -154,19 +146,19 @@ function Home() {
 
       <div className="overflow-hidden border-b border-[#c9c4b9] bg-[#d20b18] py-3 text-[#f2efe8]">
         <div className="marquee-track flex items-center gap-8 whitespace-nowrap font-mono text-[10px] tracking-[.18em]" dir="ltr">
-          {Array.from({ length: 8 }).map((_, i) => <span key={i} className="flex items-center gap-8"><span>BUILT FOR THE LONG WAY</span><span className="inline-block h-1.5 w-1.5 rounded-full bg-[#171516]" aria-hidden="true" /></span>)}
+          {Array.from({ length: 8 }).map((_, i) => <span key={i} className="flex items-center gap-8"><span>{content.tickerText}</span><span className="inline-block h-1.5 w-1.5 rounded-full bg-[#171516]" aria-hidden="true" /></span>)}
         </div>
       </div>
 
       <section id="story" className="mx-auto max-w-[1320px] px-5 py-24 sm:px-8 lg:px-12 lg:py-36">
         <div className="grid gap-14 lg:grid-cols-[.85fr_1.15fr] lg:items-end" dir="rtl">
           <div>
-            <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">01 / THE POINT OF VIEW</span>
-            <h2 className="mt-6 max-w-[570px] text-[40px] font-semibold leading-[1.18] tracking-[-.05em] sm:text-[58px]">نصنع الأشياء التي <span className="text-[#d20b18]">تتحمل القصة.</span></h2>
+            <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">{content.story.eyebrow}</span>
+            <h2 className="mt-6 max-w-[570px] text-[40px] font-semibold leading-[1.18] tracking-[-.05em] sm:text-[58px]">{content.story.title}</h2>
           </div>
           <div className="flex max-w-[470px] flex-col gap-8 lg:pb-2">
-            <p className="text-[17px] leading-9 text-[#514d47]">red-t ليست مجموعة أخرى معلقة في الخزانة. هي امتداد لطريقتك في الحركة — خامات صادقة، تصميم نظيف، وحضور لا يحتاج إلى شرح.</p>
-            <a href="#products" className="flex w-fit items-center gap-3 border-b border-[#171516] pb-2 text-[13px] font-semibold" data-testid="link-story-catalog">شاهد ما وصل حديثاً <ArrowLeft size={16} /></a>
+            <p className="text-[17px] leading-9 text-[#514d47]">{content.story.description}</p>
+            <a href="#products" className="flex w-fit items-center gap-3 border-b border-[#171516] pb-2 text-[13px] font-semibold" data-testid="link-story-catalog">{content.story.linkText} <ArrowLeft size={16} /></a>
           </div>
         </div>
       </section>
@@ -175,11 +167,11 @@ function Home() {
         <div className="mx-auto max-w-[1320px]" dir="rtl">
           <div className="mb-12 flex items-end justify-between">
             <div>
-              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">02 / TRENDING NOW</span>
-              <h2 className="mt-4 text-[38px] font-semibold tracking-[-.05em] sm:text-[54px]">الأكثر رواجاً</h2>
-              <p className="mt-3 max-w-[420px] text-sm leading-7 text-[#6e6961]">قطع لفتت الأنظار واختارها مجتمع red-t هذا الأسبوع.</p>
+              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">{content.trending.eyebrow}</span>
+              <h2 className="mt-4 text-[38px] font-semibold tracking-[-.05em] sm:text-[54px]">{content.trending.title}</h2>
+              <p className="mt-3 max-w-[420px] text-sm leading-7 text-[#6e6961]">{content.trending.description}</p>
             </div>
-            <span className="hidden font-mono text-[10px] text-[#6e6961] sm:block">DROP 01 — 2024</span>
+            <span className="hidden font-mono text-[10px] text-[#6e6961] sm:block">{content.trending.sideLabel}</span>
           </div>
           <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
             {trendingProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index + 1} />)}
@@ -191,9 +183,9 @@ function Home() {
         <div dir="rtl">
           <div className="mb-12 flex items-end justify-between">
             <div>
-              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">03 / BEST SELLERS</span>
-              <h2 className="mt-4 text-[42px] font-semibold tracking-[-.06em] sm:text-[62px]">الأكثر مبيعاً</h2>
-              <p className="mt-3 text-sm text-[#6e6961]">اختيارات موثوقة، مصممة لتبقى معك.</p>
+              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">{content.bestSellers.eyebrow}</span>
+              <h2 className="mt-4 text-[42px] font-semibold tracking-[-.06em] sm:text-[62px]">{content.bestSellers.title}</h2>
+              <p className="mt-3 text-sm text-[#6e6961]">{content.bestSellers.description}</p>
             </div>
           </div>
           <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
@@ -204,10 +196,10 @@ function Home() {
 
       <section id="categories" className="bg-[#171516] px-5 py-20 text-[#f2efe8] sm:px-8 lg:px-12 lg:py-24">
         <div className="mx-auto max-w-[1320px]" dir="rtl">
-          <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">04 / SHOP BY CATEGORY</span>
+          <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">{content.categories.eyebrow}</span>
           <div className="mt-5 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-            <h2 className="max-w-[540px] text-[42px] font-semibold leading-[1.05] tracking-[-.06em] sm:text-[62px]">الأصناف<br /><span className="text-[#d20b18]">بطريقتك.</span></h2>
-            <p className="max-w-[340px] text-sm leading-7 text-[#f2efe8]/55">اختر المسار الذي يناسبك، وستظهر لك القطع المرتبطة به مباشرة.</p>
+            <h2 className="max-w-[540px] text-[42px] font-semibold leading-[1.05] tracking-[-.06em] sm:text-[62px]">{content.categories.title[0]}<br /><span className="text-[#d20b18]">{content.categories.title[1]}</span></h2>
+            <p className="max-w-[340px] text-sm leading-7 text-[#f2efe8]/55">{content.categories.description}</p>
           </div>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {categories.slice(1).map((category, index) => (
@@ -224,18 +216,18 @@ function Home() {
         <div dir="rtl">
           <div className="flex flex-col justify-between gap-8 sm:flex-row sm:items-end">
             <div>
-              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">05 / THE FULL CATALOG</span>
-              <h2 className="mt-4 text-[42px] font-semibold tracking-[-.06em] sm:text-[62px]">كل المنتجات</h2>
-              <p className="mt-3 text-sm text-[#6e6961]">قطع اختارها الطريق. تصفح المجموعة حسب مزاجك.</p>
+              <span className="font-mono text-[10px] tracking-[.18em] text-[#d20b18]">{content.products.eyebrow}</span>
+              <h2 className="mt-4 text-[42px] font-semibold tracking-[-.06em] sm:text-[62px]">{content.products.title}</h2>
+              <p className="mt-3 text-sm text-[#6e6961]">{content.products.description}</p>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="تصنيف المنتجات">
+            <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={content.products.filterLabel}>
               {categories.map((category, index) => <button key={category} onClick={() => setActiveCategory(category)} className={`category-pill whitespace-nowrap rounded-full border border-[#c9c4b9] px-4 py-2 text-[12px] ${activeCategory === category ? 'active' : 'hover:border-[#171516]'}`} role="tab" aria-selected={activeCategory === category} data-testid={`button-filter-${index}`}>{category}</button>)}
             </div>
           </div>
           <div className="mt-12 grid auto-rows-fr gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
             {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
           </div>
-          {filteredProducts.length === 0 && <div className="py-24 text-center text-[#6e6961]">لا توجد قطع في هذا التصنيف حالياً.</div>}
+          {filteredProducts.length === 0 && <div className="py-24 text-center text-[#6e6961]">{content.products.emptyState}</div>}
         </div>
       </section>
 
@@ -243,13 +235,13 @@ function Home() {
         <div className="absolute -left-10 -top-24 font-display text-[310px] font-bold leading-none text-[#171516]/10">t</div>
         <div className="relative mx-auto grid max-w-[1320px] gap-12 lg:grid-cols-[1fr_auto] lg:items-end" dir="rtl">
           <div>
-            <span className="font-mono text-[10px] tracking-[.18em] text-[#171516]/65">04 / MAKE CONTACT</span>
-            <h2 className="mt-6 max-w-[750px] text-[48px] font-semibold leading-[1.05] tracking-[-.06em] sm:text-[76px]">لقيت اللي بدك ياه؟<br /><span className="text-[#171516]">تبدأ برسالة.</span></h2>
-            <p className="mt-8 max-w-[390px] text-[15px] leading-8 text-[#f2efe8]/75">تواصل معنا واطلب منتجك مباشرة. نرد عليك بتفاصيل التوفر، المقاس، وطرق التوصيل.</p>
+            <span className="font-mono text-[10px] tracking-[.18em] text-[#171516]/65">{content.contact.eyebrow}</span>
+            <h2 className="mt-6 max-w-[750px] text-[48px] font-semibold leading-[1.05] tracking-[-.06em] sm:text-[76px]">{content.contact.title[0]}<br /><span className="text-[#171516]">{content.contact.title[1]}</span></h2>
+            <p className="mt-8 max-w-[390px] text-[15px] leading-8 text-[#f2efe8]/75">{content.contact.description}</p>
           </div>
           <div className="flex flex-col items-start gap-4">
             <WhatsAppButton dark />
-            <span className="font-mono text-[9px] tracking-wide text-[#171516]/60">* رقم واتساب تجريبي قابل للتعديل لاحقاً</span>
+            <span className="font-mono text-[9px] tracking-wide text-[#171516]/60">{content.contact.note}</span>
           </div>
         </div>
       </section>
@@ -257,7 +249,7 @@ function Home() {
       <footer className="bg-[#171516] px-5 py-12 text-[#f2efe8] sm:px-8 lg:px-12" dir="rtl">
         <div className="mx-auto max-w-[1320px]">
           <div className="flex flex-col justify-between gap-10 border-b border-[#f2efe8]/15 pb-12 md:flex-row md:items-end">
-            <div><BrandMark compact /><p className="mt-6 max-w-[250px] text-sm leading-7 text-[#f2efe8]/50">منتجات مميزة بتصميم مختلف.</p></div>
+            <div><BrandMark compact /><p className="mt-6 max-w-[250px] text-sm leading-7 text-[#f2efe8]/50">{content.footer.statement}</p></div>
             <div className="grid grid-cols-2 gap-x-14 gap-y-4 text-[13px] text-[#f2efe8]/60">
               <a href="#products" className="hover:text-[#d20b18]" data-testid="link-footer-products">المنتجات</a>
               <a href="#story" className="hover:text-[#d20b18]" data-testid="link-footer-about">عن red-t</a>
@@ -266,7 +258,7 @@ function Home() {
               <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#d20b18]" data-testid="link-footer-instagram">إنستغرام</a>
             </div>
           </div>
-          <div className="flex flex-col justify-between gap-3 pt-6 font-mono text-[9px] tracking-[.1em] text-[#f2efe8]/35 sm:flex-row"><span dir="ltr">© 2024 RED-T STUDIO</span><span>صُنع للحركة، لا للعرض فقط.</span></div>
+          <div className="flex flex-col justify-between gap-3 pt-6 font-mono text-[9px] tracking-[.1em] text-[#f2efe8]/35 sm:flex-row"><span dir="ltr">{content.footer.copyright}</span><span>{content.footer.closing}</span></div>
         </div>
       </footer>
     </main>
