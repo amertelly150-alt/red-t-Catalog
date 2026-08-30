@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "red-t Product Catalog"
+description = "A premium Arabic RTL one-page product catalog for red-t, designed for Instagram visitors to browse products and order directly via WhatsApp without checkout or payment."
+version = "1.0.0"
+id = "artifacts/red-t-catalog"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24900
+
+[services.development]
+run = "pnpm --filter @workspace/red-t-catalog run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/red-t-catalog", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/red-t-catalog/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24900"
+BASE_PATH = "/"
