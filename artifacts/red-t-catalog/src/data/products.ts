@@ -5,6 +5,7 @@ export type Product = {
   price: string;
   image: string;
   category: string;
+  subcategory: string;
   trending: boolean;
   bestSeller: boolean;
   nameEn: string;
@@ -12,14 +13,40 @@ export type Product = {
   tone: string;
 };
 
-export const categories = [
-  'الكل',
-  '🚗 منتجات السيارات',
-  '🔑 ميداليات ومفاتيح',
-  '🖼️ لوحات',
-  '🎁 هدايا',
-  '⭐ منتجات مميزة',
-] as const;
+export const ALL_CATEGORY = 'الكل';
+export const ALL_SUBCATEGORY = 'الكل';
+
+export type CategoryGroup = {
+  name: string;
+  subcategories: readonly string[];
+};
+
+// Add, remove, or rename a category/subcategory here. The catalog filters and
+// category cards are generated from this one structure.
+export const categories: readonly CategoryGroup[] = [
+  {
+    name: '🚗 منتجات السيارات',
+    subcategories: ['BMW', 'Mercedes', 'Hyundai', 'Kia', 'Motorcycles', 'Other'],
+  },
+  {
+    name: '🔑 ميداليات ومفاتيح',
+    subcategories: ['سيارات', 'شخصيات', 'أسماء', 'أخرى'],
+  },
+  {
+    name: '🖼️ لوحات',
+    subcategories: ['رياضية', 'أنمي', 'سيارات', 'أفلام ومسلسلات', 'ألعاب', 'اقتباسات'],
+  },
+  {
+    name: '🎁 هدايا',
+    subcategories: ['رجالية', 'نسائية', 'مناسبات', 'مخصصة'],
+  },
+  {
+    name: '⭐ منتجات مميزة',
+    subcategories: ['إصدار محدود', 'أساسيات', 'أخرى'],
+  },
+];
+
+export const categoryNames = [ALL_CATEGORY, ...categories.map((category) => category.name)];
 
 // Replace any image path below with a real photo later; the card layout does not need to change.
 export const products: Product[] = [
@@ -31,6 +58,7 @@ export const products: Product[] = [
     price: '٣٨٥ ر.س',
     image: '/images/products/product-01.jpg',
     category: '🎁 هدايا',
+    subcategory: 'رجالية',
     trending: true,
     bestSeller: true,
     badge: 'الأكثر طلباً',
@@ -44,6 +72,7 @@ export const products: Product[] = [
     price: '٢٩٥ ر.س',
     image: '/images/products/product-02.jpg',
     category: '⭐ منتجات مميزة',
+    subcategory: 'إصدار محدود',
     trending: true,
     bestSeller: true,
     badge: 'إصدار محدود',
@@ -57,6 +86,7 @@ export const products: Product[] = [
     price: '١٤٥ ر.س',
     image: '/images/products/product-03.jpg',
     category: '🚗 منتجات السيارات',
+    subcategory: 'Other',
     trending: true,
     bestSeller: true,
     tone: 'فولاذ مصقول',
@@ -69,6 +99,7 @@ export const products: Product[] = [
     price: '١٦٥ ر.س',
     image: '/images/products/product-04.jpg',
     category: '🖼️ لوحات',
+    subcategory: 'سيارات',
     trending: true,
     bestSeller: false,
     tone: 'أسود وأحمر',
@@ -81,6 +112,7 @@ export const products: Product[] = [
     price: '١٢٥ ر.س',
     image: '/images/products/product-05.jpg',
     category: '🚗 منتجات السيارات',
+    subcategory: 'Other',
     trending: false,
     bestSeller: true,
     tone: 'أسود مطفي',
@@ -93,6 +125,7 @@ export const products: Product[] = [
     price: '١٣٥ ر.س',
     image: '/images/products/product-06.jpg',
     category: '🚗 منتجات السيارات',
+    subcategory: 'Other',
     trending: false,
     bestSeller: false,
     tone: 'أسود وأحمر',
@@ -105,6 +138,7 @@ export const products: Product[] = [
     price: '٢٤٥ ر.س',
     image: '/images/products/product-07.jpg',
     category: '🖼️ لوحات',
+    subcategory: 'سيارات',
     trending: true,
     bestSeller: false,
     badge: 'جديد',
@@ -118,6 +152,7 @@ export const products: Product[] = [
     price: '١٨٥ ر.س',
     image: '/images/products/product-08.jpg',
     category: '🚗 منتجات السيارات',
+    subcategory: 'Other',
     trending: false,
     bestSeller: true,
     tone: 'أسود مع أحمر',
@@ -130,6 +165,7 @@ export const products: Product[] = [
     price: '٧٥ ر.س',
     image: '/images/products/product-09.jpg',
     category: '🔑 ميداليات ومفاتيح',
+    subcategory: 'سيارات',
     trending: true,
     bestSeller: true,
     tone: 'أحمر سباقي',
@@ -142,6 +178,7 @@ export const products: Product[] = [
     price: '٦٥ ر.س',
     image: '/images/products/product-10.jpg',
     category: '⭐ منتجات مميزة',
+    subcategory: 'أساسيات',
     trending: false,
     bestSeller: false,
     tone: 'أسود مطفي',
@@ -154,6 +191,7 @@ export const products: Product[] = [
     price: '١٩٥ ر.س',
     image: '/images/products/product-11.jpg',
     category: '🎁 هدايا',
+    subcategory: 'مناسبات',
     trending: false,
     bestSeller: true,
     badge: 'هدية مثالية',
@@ -167,6 +205,7 @@ export const products: Product[] = [
     price: '٢٢٥ ر.س',
     image: '/images/products/product-12.jpg',
     category: '🎁 هدايا',
+    subcategory: 'رجالية',
     trending: true,
     bestSeller: false,
     tone: 'أسود لامع',

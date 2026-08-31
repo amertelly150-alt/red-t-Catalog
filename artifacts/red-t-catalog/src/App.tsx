@@ -7,7 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { content, WHATSAPP_NUMBER } from '@/data/content';
-import { categories, products, type Product } from '@/data/products';
+import { ALL_CATEGORY, ALL_SUBCATEGORY, categories, categoryNames, products, type Product } from '@/data/products';
 
 const queryClient = new QueryClient();
 const trendingProducts = products.filter((product) => product.trending);
@@ -105,8 +105,28 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 function Home() {
-  const [activeCategory, setActiveCategory] = useState('الكل');
-  const filteredProducts = useMemo(() => activeCategory === 'الكل' ? products : products.filter((product) => product.category === activeCategory), [activeCategory]);
+  const [activeCategory, setActiveCategory] = useState(ALL_CATEGORY);
+  const [activeSubcategory, setActiveSubcategory] = useState(ALL_SUBCATEGORY);
+  const selectedCategory = useMemo(() => categories.find((category) => category.name === activeCategory), [activeCategory]);
+  const availableSubcategories = selectedCategory ? [ALL_SUBCATEGORY, ...selectedCategory.subcategories] : [];
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === ALL_CATEGORY) return products;
+    return products.filter((product) => (
+      product.category === activeCategory
+      && (activeSubcategory === ALL_SUBCATEGORY || product.subcategory === activeSubcategory)
+    ));
+  }, [activeCategory, activeSubcategory]);
+
+  const selectCategory = (category: string) => {
+    setActiveCategory(category);
+    setActiveSubcategory(ALL_SUBCATEGORY);
+  };
+
+  const selectCategoryAndScroll = (category: string) => {
+    selectCategory(category);
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <main id="top" className="grain min-h-[100dvh] bg-[#f2efe8] text-[#171516]" dir="rtl">
       <section className="relative min-h-[700px] overflow-hidden bg-[#171516] text-[#f2efe8] lg:min-h-[790px]">
@@ -202,10 +222,10 @@ function Home() {
             <p className="max-w-[340px] text-sm leading-7 text-[#f2efe8]/55">{content.categories.description}</p>
           </div>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {categories.slice(1).map((category, index) => (
-              <button key={category} onClick={() => { setActiveCategory(category); document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }); }} className="category-card flex min-h-[118px] flex-col justify-between rounded-[3px] border border-[#f2efe8]/15 bg-[#222021] p-4 text-right transition hover:-translate-y-1 hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid={`button-category-${index}`}>
-                <span className="text-xl">{category.split(' ')[0]}</span>
-                <span className="text-[12px] font-semibold leading-5">{category.substring(category.indexOf(' ') + 1)}</span>
+            {categories.map((category, index) => (
+              <button key={category.name} onClick={() => selectCategoryAndScroll(category.name)} className="category-card flex min-h-[118px] flex-col justify-between rounded-[3px] border border-[#f2efe8]/15 bg-[#222021] p-4 text-right transition hover:-translate-y-1 hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid={`button-category-${index}`}>
+                <span className="text-xl">{category.name.split(' ')[0]}</span>
+                <span className="text-[12px] font-semibold leading-5">{category.name.substring(category.name.indexOf(' ') + 1)}</span>
               </button>
             ))}
           </div>
@@ -221,9 +241,25 @@ function Home() {
               <p className="mt-3 text-sm text-[#6e6961]">{content.products.description}</p>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={content.products.filterLabel}>
-              {categories.map((category, index) => <button key={category} onClick={() => setActiveCategory(category)} className={`category-pill whitespace-nowrap rounded-full border border-[#c9c4b9] px-4 py-2 text-[12px] ${activeCategory === category ? 'active' : 'hover:border-[#171516]'}`} role="tab" aria-selected={activeCategory === category} data-testid={`button-filter-${index}`}>{category}</button>)}
+              {categoryNames.map((category, index) => <button key={category} onClick={() => selectCategory(category)} className={`category-pill whitespace-nowrap rounded-full border border-[#c9c4b9] px-4 py-2 text-[12px] ${activeCategory === category ? 'active' : 'hover:border-[#171516]'}`} role="tab" aria-selected={activeCategory === category} data-testid={`button-filter-${index}`}>{category}</button>)}
             </div>
           </div>
+          {activeCategory !== ALL_CATEGORY && (
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={`التصنيفات الفرعية لـ ${activeCategory}`}>
+              {availableSubcategories.map((subcategory, index) => (
+                <button
+                  key={subcategory}
+                  onClick={() => setActiveSubcategory(subcategory)}
+                  className={`whitespace-nowrap rounded-full border px-4 py-2 text-[12px] transition-colors ${activeSubcategory === subcategory ? 'border-[#DF2531] bg-[#DF2531] text-[#f2efe8]' : 'border-[#171516] bg-[#171516] text-[#f2efe8]/75 hover:border-[#DF2531] hover:text-[#f2efe8]'}`}
+                  role="tab"
+                  aria-selected={activeSubcategory === subcategory}
+                  data-testid={`button-subcategory-${index}`}
+                >
+                  {subcategory}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="mt-12 grid auto-rows-fr gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
             {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
           </div>
