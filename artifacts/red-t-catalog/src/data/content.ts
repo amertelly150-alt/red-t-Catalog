@@ -1,3 +1,5 @@
+import { defaultSiteSettings } from '@workspace/catalog-data';
+
 export const content = {
   brandName: 'red-t',
   navigation: [
@@ -9,9 +11,9 @@ export const content = {
   ],
   hero: {
     eyebrow: 'EST. 2024 / RIYADH',
-    headline: ['اكتشف منتجاتك', 'المفضلة.'],
-    description: 'قطع مختارة لمن يعيشون التفاصيل. ملابس، إكسسوارات، وأساسيات ترافقك من أول تشغيل إلى آخر محطة.',
-    image: '/images/hero/hero-main.jpg',
+    headline: defaultSiteSettings.heroHeadline,
+    description: defaultSiteSettings.heroDescription,
+    image: defaultSiteSettings.heroImage,
     ctaText: 'تصفح المنتجات',
     scrollLabel: 'SCROLL TO EXPLORE',
   },
@@ -66,4 +68,4 @@ export const content = {
 } as const;
 
 // Change this one value only. Keep the country code and remove spaces or symbols.
-export const WHATSAPP_NUMBER = '966500000000';
+export const WHATSAPP_NUMBER = defaultSiteSettings.whatsappNumber;

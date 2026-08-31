@@ -415,6 +415,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .nav-link::after { content: ''; position: absolute; bottom: -7px; right: 0; width: 0; height: 2px; background: #d20b18; transition: width .25s ease; }
 .nav-link:hover::after { width: 100%; }
 .hero-grid { background-image: linear-gradient(rgba(242,239,232,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(242,239,232,.09) 1px, transparent 1px); background-size: 54px 54px; }
+.admin-input { width: 100%; border: 1px solid #c9c4b9; border-radius: 3px; background: #f2efe8; color: #171516; padding: .72rem .8rem; font-size: .82rem; outline: none; transition: border-color .2s, box-shadow .2s; }
+.admin-input:focus { border-color: #d20b18; box-shadow: 0 0 0 3px rgba(210, 11, 24, .1); }
+.dark-input { border-color: rgba(242,239,232,.2); background: rgba(242,239,232,.08); color: #f2efe8; }
+.dark-input::placeholder { color: rgba(242,239,232,.35); }
 @media (max-width: 767px) {
   .display-tight { letter-spacing: -.05em; }
   .hero-grid { background-size: 32px 32px; }

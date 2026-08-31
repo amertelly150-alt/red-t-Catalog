@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: catalog
+    description: Public catalog operations
+  - name: admin
+    description: Protected catalog administration
 paths:
   /healthz:
     get:
@@ -24,6 +28,257 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /catalog:
+    get:
+      operationId: getCatalog
+      tags: [catalog]
+      summary: Get the public catalog
+      responses:
+        "200":
+          description: Current catalog data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogResponse"
+  /admin/session:
+    get:
+      operationId: getAdminSession
+      tags: [admin]
+      summary: Check the admin session
+      responses:
+        "200":
+          description: Session status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Log in to the admin dashboard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Authenticated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "400":
+          description: Invalid login request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Admin credentials are not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Log out of the admin dashboard
+      responses:
+        "204":
+          description: Session cleared
+  /admin/catalog:
+    get:
+      operationId: getAdminCatalog
+      tags: [admin]
+      summary: Get catalog data for the dashboard
+      responses:
+        "200":
+          description: Current catalog data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/products:
+    post:
+      operationId: createAdminProduct
+      tags: [admin]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/products/{id}:
+    patch:
+      operationId: updateAdminProduct
+      tags: [admin]
+      summary: Update a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+           type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid product or id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAdminProduct
+      tags: [admin]
+      summary: Delete a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+           type: number
+      responses:
+        "204":
+          description: Product deleted
+        "400":
+          description: Invalid product id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/site:
+    put:
+      operationId: updateAdminSite
+      tags: [admin]
+      summary: Update hero and WhatsApp settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettingsInput"
+      responses:
+        "200":
+          description: Updated site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+        "400":
+          description: Invalid site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/categories:
+    put:
+      operationId: updateAdminCategories
+      tags: [admin]
+      summary: Replace the category tree
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoriesInput"
+      responses:
+        "200":
+          description: Updated categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+        "400":
+          description: Invalid categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +288,196 @@ components:
           type: string
       required:
         - status
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - price
+        - image
+        - category
+        - subcategory
+        - trending
+        - bestSeller
+        - nameEn
+        - tone
+      properties:
+        id:
+           type: number
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        image:
+          type: string
+        category:
+          type: string
+        subcategory:
+          type: string
+        trending:
+          type: boolean
+        bestSeller:
+          type: boolean
+        nameEn:
+          type: string
+        badge:
+          type: ["string", "null"]
+        tone:
+          type: string
+    ProductInput:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - image
+        - category
+        - subcategory
+        - trending
+        - bestSeller
+        - nameEn
+        - tone
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: string
+        image:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        subcategory:
+          type: string
+          minLength: 1
+        trending:
+          type: boolean
+        bestSeller:
+          type: boolean
+        nameEn:
+          type: string
+        badge:
+          type: ["string", "null"]
+        tone:
+          type: string
+    Category:
+      type: object
+      required:
+        - name
+        - subcategories
+      properties:
+        name:
+          type: string
+          minLength: 1
+        subcategories:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            minLength: 1
+    SiteSettings:
+      type: object
+      required:
+        - heroImage
+        - heroHeadline
+        - heroDescription
+        - whatsappNumber
+      properties:
+        heroImage:
+          type: string
+          minLength: 1
+        heroHeadline:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: string
+        heroDescription:
+          type: string
+        whatsappNumber:
+          type: string
+          pattern: "^[1-9][0-9]{7,14}$"
+    SiteSettingsInput:
+      type: object
+      required:
+        - heroImage
+        - heroHeadline
+        - heroDescription
+        - whatsappNumber
+      properties:
+        heroImage:
+          type: string
+          minLength: 1
+        heroHeadline:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: string
+        heroDescription:
+          type: string
+        whatsappNumber:
+          type: string
+          pattern: "^[1-9][0-9]{7,14}$"
+    CategoriesInput:
+      type: object
+      required:
+        - categories
+      properties:
+        categories:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/Category"
+    CatalogResponse:
+      type: object
+      required:
+        - products
+        - categories
+        - site
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        site:
+          $ref: "#/components/schemas/SiteSettings"
+    LoginInput:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+          writeOnly: true
+    SessionResponse:
+      type: object
+      required:
+        - authenticated
+      properties:
+        authenticated:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
 

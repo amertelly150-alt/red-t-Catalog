@@ -5,32 +5,32 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import Admin from '@/pages/admin';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { content, WHATSAPP_NUMBER } from '@/data/content';
+import { content as defaultContent, WHATSAPP_NUMBER } from '@/data/content';
 import { ALL_CATEGORY, ALL_SUBCATEGORY, categories, categoryNames, products, type Product } from '@/data/products';
+import { useGetCatalog } from '@workspace/api-client-react';
 
 const queryClient = new QueryClient();
-const trendingProducts = products.filter((product) => product.trending);
-const bestSellerProducts = products.filter((product) => product.bestSeller);
 
-function whatsappHref(product?: Product) {
+function whatsappHref(product?: Product, whatsappNumber = WHATSAPP_NUMBER) {
   const message = product
-    ? `${content.whatsapp.productMessagePrefix} ${product.name}`
-    : content.whatsapp.genericMessage;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    ? `${defaultContent.whatsapp.productMessagePrefix} ${product.name}`
+    : defaultContent.whatsapp.genericMessage;
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
 
-function WhatsAppButton({ product, dark = false }: { product?: Product; dark?: boolean }) {
+function WhatsAppButton({ product, dark = false, whatsappNumber = WHATSAPP_NUMBER }: { product?: Product; dark?: boolean; whatsappNumber?: string }) {
   return (
     <a
-      href={whatsappHref(product)}
+      href={whatsappHref(product, whatsappNumber)}
       target="_blank"
       rel="noreferrer"
       data-testid={product ? `link-order-${product.id}` : 'link-whatsapp-contact'}
       className={`inline-flex items-center justify-center gap-3 rounded-full px-5 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${dark ? 'bg-[#f2efe8] text-[#171516] hover:bg-[#d20b18] hover:text-[#f2efe8]' : 'bg-[#d20b18] text-[#f2efe8] hover:bg-[#171516]'}`}
     >
       <MessageCircle size={17} strokeWidth={1.8} />
-      <span>{product ? content.whatsapp.productButton : content.whatsapp.genericButton}</span>
+      <span>{product ? defaultContent.whatsapp.productButton : defaultContent.whatsapp.genericButton}</span>
     </a>
   );
 }
@@ -39,26 +39,26 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <a href="#top" className={`flex items-center gap-2 ${compact ? 'scale-90 origin-right' : ''}`} data-testid="link-brand-home">
       <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[3px] bg-[#f7f6f3]">
-        <img src={content.logoPath} alt="red-t الشعار" className="h-full w-full object-contain" />
+      <img src={defaultContent.logoPath} alt="red-t الشعار" className="h-full w-full object-contain" />
       </span>
     </a>
   );
 }
 
-function Nav() {
+function Nav({ whatsappNumber = WHATSAPP_NUMBER }: { whatsappNumber?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <header className="absolute inset-x-0 top-0 z-30">
       <div className="mx-auto flex h-[74px] max-w-[1320px] items-center justify-between px-5 sm:px-8 lg:px-12" dir="rtl">
         <BrandMark />
         <nav className="hidden items-center gap-9 md:flex">
-          {content.navigation.map(({ label, href }) => (
+          {defaultContent.navigation.map(({ label, href }) => (
             <a key={href} href={href} className="nav-link text-[13px] font-medium text-[#f2efe8]/75 hover:text-[#f2efe8]" data-testid={`link-nav-${label}`}>{label}</a>
           ))}
         </nav>
         <div className="hidden items-center gap-5 md:flex">
           <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[#f2efe8]/70 transition hover:text-[#f2efe8]" data-testid="link-instagram"><Instagram size={18} /></a>
-          <a href="#products" className="rounded-full border border-[#f2efe8]/30 px-5 py-2.5 text-[12px] font-semibold text-[#f2efe8] transition hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid="link-browse-products">{content.hero.ctaText}</a>
+           <a href="#products" className="rounded-full border border-[#f2efe8]/30 px-5 py-2.5 text-[12px] font-semibold text-[#f2efe8] transition hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid="link-browse-products">{defaultContent.hero.ctaText}</a>
         </div>
         <button onClick={() => setOpen(!open)} className="text-[#f2efe8] md:hidden" aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'} data-testid="button-mobile-menu">
           {open ? <X size={25} /> : <Menu size={25} />}
@@ -67,8 +67,8 @@ function Nav() {
       {open && (
         <div className="mx-4 border-t border-[#f2efe8]/15 bg-[#171516] px-5 py-5 md:hidden" dir="rtl">
           <div className="flex flex-col gap-5">
-            {content.navigation.map(({ label, href }) => <a key={href} href={href} onClick={() => setOpen(false)} className="text-sm text-[#f2efe8]/80" data-testid={`link-mobile-${label}`}>{label}</a>)}
-            <WhatsAppButton />
+            {defaultContent.navigation.map(({ label, href }) => <a key={href} href={href} onClick={() => setOpen(false)} className="text-sm text-[#f2efe8]/80" data-testid={`link-mobile-${label}`}>{label}</a>)}
+            <WhatsAppButton whatsappNumber={whatsappNumber} />
           </div>
         </div>
       )}
@@ -76,7 +76,7 @@ function Nav() {
   );
 }
 
-function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product, index, whatsappNumber = WHATSAPP_NUMBER }: { product: Product; index: number; whatsappNumber?: string }) {
   return (
     <article className={`product-card group ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} data-testid={`card-product-${product.id}`} dir="rtl">
       <div className={`relative overflow-hidden bg-[#dedbd3] ${index === 0 ? 'aspect-[1/1.08] md:aspect-auto md:h-full' : 'aspect-[1/1.06]'}`}>
@@ -97,7 +97,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
         </div>
         <div className="text-left">
           <span className="whitespace-nowrap font-mono text-[12px] font-medium text-[#171516]">{product.price}</span>
-          <a href={whatsappHref(product)} target="_blank" rel="noreferrer" className="mt-3 inline-flex whitespace-nowrap rounded-full bg-[#d20b18] px-3 py-2 text-[10px] font-semibold text-[#f2efe8] transition hover:bg-[#171516]" data-testid={`link-card-order-${product.id}`}>اطلب عبر واتساب</a>
+           <a href={whatsappHref(product, whatsappNumber)} target="_blank" rel="noreferrer" className="mt-3 inline-flex whitespace-nowrap rounded-full bg-[#d20b18] px-3 py-2 text-[10px] font-semibold text-[#f2efe8] transition hover:bg-[#171516]" data-testid={`link-card-order-${product.id}`}>اطلب عبر واتساب</a>
         </div>
       </div>
     </article>
@@ -105,17 +105,28 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 function Home() {
+  const catalogQuery = useGetCatalog();
+  const apiCatalog = catalogQuery.data;
+  const liveProducts = apiCatalog?.products ?? products;
+  const liveCategories = apiCatalog?.categories ?? categories;
+  const liveCategoryNames = [ALL_CATEGORY, ...liveCategories.map((category) => category.name)];
+  const liveWhatsappNumber = apiCatalog?.site.whatsappNumber ?? WHATSAPP_NUMBER;
+  const content = apiCatalog?.site
+    ? { ...defaultContent, hero: { ...defaultContent.hero, image: apiCatalog.site.heroImage, headline: apiCatalog.site.heroHeadline, description: apiCatalog.site.heroDescription } }
+    : defaultContent;
+  const trendingProducts = liveProducts.filter((product) => product.trending);
+  const bestSellerProducts = liveProducts.filter((product) => product.bestSeller);
   const [activeCategory, setActiveCategory] = useState(ALL_CATEGORY);
   const [activeSubcategory, setActiveSubcategory] = useState(ALL_SUBCATEGORY);
-  const selectedCategory = useMemo(() => categories.find((category) => category.name === activeCategory), [activeCategory]);
+  const selectedCategory = useMemo(() => liveCategories.find((category) => category.name === activeCategory), [activeCategory, liveCategories]);
   const availableSubcategories = selectedCategory ? [ALL_SUBCATEGORY, ...selectedCategory.subcategories] : [];
   const filteredProducts = useMemo(() => {
-    if (activeCategory === ALL_CATEGORY) return products;
-    return products.filter((product) => (
+    if (activeCategory === ALL_CATEGORY) return liveProducts;
+    return liveProducts.filter((product) => (
       product.category === activeCategory
       && (activeSubcategory === ALL_SUBCATEGORY || product.subcategory === activeSubcategory)
     ));
-  }, [activeCategory, activeSubcategory]);
+  }, [activeCategory, activeSubcategory, liveProducts]);
 
   const selectCategory = (category: string) => {
     setActiveCategory(category);
@@ -130,7 +141,7 @@ function Home() {
   return (
     <main id="top" className="grain min-h-[100dvh] bg-[#f2efe8] text-[#171516]" dir="rtl">
       <section className="relative min-h-[700px] overflow-hidden bg-[#171516] text-[#f2efe8] lg:min-h-[790px]">
-        <Nav />
+        <Nav whatsappNumber={liveWhatsappNumber} />
         <div className="hero-grid absolute inset-0 opacity-50" />
         <div className="absolute -left-16 top-24 h-[420px] w-[420px] rounded-full bg-[#d20b18]/20 blur-[100px]" />
         <div className="absolute inset-0 opacity-50 lg:right-[47%]">
@@ -194,7 +205,7 @@ function Home() {
             <span className="hidden font-mono text-[10px] text-[#6e6961] sm:block">{content.trending.sideLabel}</span>
           </div>
           <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
-            {trendingProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index + 1} />)}
+            {trendingProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index + 1} whatsappNumber={liveWhatsappNumber} />)}
           </div>
         </div>
       </section>
@@ -209,7 +220,7 @@ function Home() {
             </div>
           </div>
           <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
-            {bestSellerProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index + 1} />)}
+            {bestSellerProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index + 1} whatsappNumber={liveWhatsappNumber} />)}
           </div>
         </div>
       </section>
@@ -222,7 +233,7 @@ function Home() {
             <p className="max-w-[340px] text-sm leading-7 text-[#f2efe8]/55">{content.categories.description}</p>
           </div>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {categories.map((category, index) => (
+            {liveCategories.map((category, index) => (
               <button key={category.name} onClick={() => selectCategoryAndScroll(category.name)} className="category-card flex min-h-[118px] flex-col justify-between rounded-[3px] border border-[#f2efe8]/15 bg-[#222021] p-4 text-right transition hover:-translate-y-1 hover:border-[#d20b18] hover:bg-[#d20b18]" data-testid={`button-category-${index}`}>
                 <span className="text-xl">{category.name.split(' ')[0]}</span>
                 <span className="text-[12px] font-semibold leading-5">{category.name.substring(category.name.indexOf(' ') + 1)}</span>
@@ -241,7 +252,7 @@ function Home() {
               <p className="mt-3 text-sm text-[#6e6961]">{content.products.description}</p>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={content.products.filterLabel}>
-              {categoryNames.map((category, index) => <button key={category} onClick={() => selectCategory(category)} className={`category-pill whitespace-nowrap rounded-full border border-[#c9c4b9] px-4 py-2 text-[12px] ${activeCategory === category ? 'active' : 'hover:border-[#171516]'}`} role="tab" aria-selected={activeCategory === category} data-testid={`button-filter-${index}`}>{category}</button>)}
+              {liveCategoryNames.map((category, index) => <button key={category} onClick={() => selectCategory(category)} className={`category-pill whitespace-nowrap rounded-full border border-[#c9c4b9] px-4 py-2 text-[12px] ${activeCategory === category ? 'active' : 'hover:border-[#171516]'}`} role="tab" aria-selected={activeCategory === category} data-testid={`button-filter-${index}`}>{category}</button>)}
             </div>
           </div>
           {activeCategory !== ALL_CATEGORY && (
@@ -261,7 +272,7 @@ function Home() {
             </div>
           )}
           <div className="mt-12 grid auto-rows-fr gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
-            {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
+            {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} whatsappNumber={liveWhatsappNumber} />)}
           </div>
           {filteredProducts.length === 0 && <div className="py-24 text-center text-[#6e6961]">{content.products.emptyState}</div>}
         </div>
@@ -276,7 +287,7 @@ function Home() {
             <p className="mt-8 max-w-[390px] text-[15px] leading-8 text-[#f2efe8]/75">{content.contact.description}</p>
           </div>
           <div className="flex flex-col items-start gap-4">
-            <WhatsAppButton dark />
+             <WhatsAppButton dark whatsappNumber={liveWhatsappNumber} />
             <span className="font-mono text-[9px] tracking-wide text-[#171516]/60">{content.contact.note}</span>
           </div>
         </div>
@@ -306,6 +317,7 @@ function Router() {
     <ErrorBoundary resetKey={useLocation()[0]}>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
     </ErrorBoundary>
