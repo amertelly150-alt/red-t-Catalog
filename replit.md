@@ -1,44 +1,58 @@
-# [Project name]
+# red-t Product Catalog
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+كتالوج عربي RTL لمنتجات red-t مع طلب مباشر عبر واتساب ولوحة إدارة خاصة.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- Validation: Zod, `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/red-t-catalog/src/App.tsx` — public RTL storefront and `/admin` route
+- `artifacts/red-t-catalog/src/pages/admin.tsx` — authenticated product/site/category dashboard
+- `artifacts/api-server/src/routes/admin.ts` — protected admin API endpoints
+- `artifacts/api-server/src/lib/catalog-store.ts` — PostgreSQL catalog reads, seed, and writes
+- `lib/db/src/schema/catalog.ts` — Drizzle catalog tables
+- `lib/api-spec/openapi.yaml` — source of truth for generated API clients and Zod schemas
+- `lib/catalog-data/src/index.ts` — shared initial products, categories, and site defaults
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Public storefront and `/admin` remain one web artifact; there is no customer-facing admin link.
+- Catalog data is stored in PostgreSQL and seeded once from the shared demo data on first access.
+- Admin sessions use an HMAC-signed, HttpOnly cookie with the existing `SESSION_SECRET`; credentials are environment secrets.
+- Uploaded images are compressed in the browser and stored as data URLs in PostgreSQL to remain deploy-safe without filesystem persistence.
+- The public storefront keeps static defaults as a safe loading/error fallback, but prefers the live API catalog.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Visitors browse products in Arabic RTL with two-level filtering and separate trending/best-seller sections.
+- Visitors order through WhatsApp; there is no account, cart, checkout, or payment flow.
+- The owner can manage products, images, categories, hero content, and the WhatsApp number at `/admin`.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Preserve the customer-facing red-t visual design while changing content and data behavior.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD` in Replit Secrets before using `/admin`; the app intentionally has no insecure default credentials.
+- Run API codegen after changing `lib/api-spec/openapi.yaml`.
+- Production database schema changes are applied through Replit Publish; local development schema uses `pnpm --filter @workspace/db run push`.
 
 ## Pointers
 

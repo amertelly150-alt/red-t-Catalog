@@ -475,7 +475,7 @@ function LoginScreen({ onLogin, notice, setNotice }: { onLogin: () => void; noti
     <main className="flex min-h-screen items-center justify-center bg-[#171516] px-5 py-10 text-[#f2efe8]" dir="rtl">
       <form onSubmit={submit} className="w-full max-w-md rounded-[4px] border border-[#f2efe8]/15 bg-[#222021] p-6 shadow-2xl sm:p-9">
         <div className="mb-9 flex h-14 w-14 items-center justify-center overflow-hidden rounded-[3px] bg-[#f7f6f3]">
-          <img src="/images/logo.png" alt="red-t الشعار" className="h-full w-full object-contain" />
+          <img src="/images/logo/red-t-logo.png" alt="red-t الشعار" className="h-full w-full object-contain" />
         </div>
         <p className="font-mono text-[10px] tracking-[.16em] text-[#d20b18]">RED-T / PRIVATE AREA</p>
         <h1 className="mt-3 text-3xl font-semibold">دخول الإدارة</h1>

@@ -156,6 +156,15 @@ router.put('/admin/categories', requireAdmin, async (req, res): Promise<void> =>
     res.status(400).json({ error: 'لا يمكن تكرار أسماء التصنيفات أو التصنيفات الفرعية.' });
     return;
   }
+  const catalog = await getCatalog();
+  const invalidProduct = catalog.products.find((product) => {
+    const category = categories.find((item) => item.name === product.category);
+    return !category || !category.subcategories.includes(product.subcategory);
+  });
+  if (invalidProduct) {
+    res.status(400).json({ error: `حدّث تصنيف المنتج «${invalidProduct.name}» أولًا قبل حذف أو إعادة تسمية التصنيف المرتبط به.` });
+    return;
+  }
   const updated = await updateCategories(categories);
   res.json(UpdateAdminCategoriesResponse.parse(updated));
 });

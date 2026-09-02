@@ -1,0 +1,1 @@
+- [OpenAPI and Zod compatibility](openapi-zod-compatibility.md) — use compatible numeric schemas when Orval emits unsupported `z.int()` for the installed Zod version.
