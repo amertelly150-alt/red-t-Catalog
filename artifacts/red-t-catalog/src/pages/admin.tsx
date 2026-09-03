@@ -31,9 +31,17 @@ async function requestJson<T>(url: string, init: RequestInit = {}): Promise<T> {
   if (init.body && !headers.has('content-type')) headers.set('content-type', 'application/json');
   const response = await fetch(url, { ...init, headers, credentials: 'same-origin' });
   const raw = await response.text();
-  const payload = raw ? JSON.parse(raw) : null;
+  let payload: { error?: string } | null = null;
+  try {
+    payload = raw ? JSON.parse(raw) : null;
+  } catch {
+    payload = null;
+  }
   if (!response.ok) {
-    throw new Error(payload?.error || 'حدث خطأ غير متوقع.');
+    const message = response.status === 413
+      ? 'حجم الصورة كبير جدًا. اختر صورة أصغر أو أعد رفعها ليتم ضغطها تلقائيًا.'
+      : payload?.error || 'حدث خطأ غير متوقع.';
+    throw new Error(message);
   }
   return payload as T;
 }
@@ -85,14 +93,28 @@ async function compressImage(file: File): Promise<string> {
     element.onerror = () => reject(new Error('تعذر تحميل الصورة.'));
     element.src = source;
   });
-  const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
   const context = canvas.getContext('2d');
   if (!context) throw new Error('تعذر تجهيز الصورة.');
-  context.drawImage(image, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL('image/jpeg', 0.82);
+
+  const maxBytes = 2_000_000;
+  let maxDimension = 1600;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const quality = Math.max(0.46, 0.82 - attempt * 0.06);
+    const encoded = canvas.toDataURL('image/jpeg', quality);
+    const base64 = encoded.slice(encoded.indexOf(',') + 1);
+    const byteLength = Math.ceil(base64.length * 3 / 4);
+    if (byteLength <= maxBytes) return encoded;
+    maxDimension = Math.round(maxDimension * 0.8);
+  }
+
+  throw new Error('تعذر ضغط الصورة إلى حجم مناسب. اختر صورة أخرى أصغر.');
 }
 
 function AdminFrame({
