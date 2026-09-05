@@ -8,7 +8,7 @@ import NotFound from '@/pages/not-found';
 import Admin from '@/pages/admin';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { content as defaultContent, WHATSAPP_NUMBER } from '@/data/content';
-import { ALL_CATEGORY, ALL_SUBCATEGORY, categories, categoryNames, products, type Product } from '@/data/products';
+import { ALL_CATEGORY, ALL_SUBCATEGORY, type Product } from '@/data/products';
 import { useGetCatalog } from '@workspace/api-client-react';
 
 const queryClient = new QueryClient();
@@ -105,10 +105,20 @@ function ProductCard({ product, index, whatsappNumber = WHATSAPP_NUMBER }: { pro
 }
 
 function Home() {
-  const catalogQuery = useGetCatalog();
+  const catalogQuery = useGetCatalog({
+    query: {
+      queryKey: ['/api/catalog'],
+      staleTime: 0,
+      refetchInterval: 5000,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: 'always',
+      refetchOnReconnect: 'always',
+    },
+    request: { cache: 'no-store' },
+  });
   const apiCatalog = catalogQuery.data;
-  const liveProducts = apiCatalog?.products ?? products;
-  const liveCategories = apiCatalog?.categories ?? categories;
+  const liveProducts = apiCatalog?.products ?? [];
+  const liveCategories = apiCatalog?.categories ?? [];
   const liveCategoryNames = [ALL_CATEGORY, ...liveCategories.map((category) => category.name)];
   const liveWhatsappNumber = apiCatalog?.site.whatsappNumber ?? WHATSAPP_NUMBER;
   const content = apiCatalog?.site
@@ -271,10 +281,16 @@ function Home() {
               ))}
             </div>
           )}
-          <div className="mt-12 grid auto-rows-fr gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
-            {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} whatsappNumber={liveWhatsappNumber} />)}
-          </div>
-          {filteredProducts.length === 0 && <div className="py-24 text-center text-[#6e6961]">{content.products.emptyState}</div>}
+          {catalogQuery.isPending ? (
+            <div className="py-24 text-center text-[#6e6961]">جارٍ تحميل المنتجات...</div>
+          ) : (
+            <>
+              <div className="mt-12 grid auto-rows-fr gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3">
+                {filteredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} whatsappNumber={liveWhatsappNumber} />)}
+              </div>
+              {filteredProducts.length === 0 && <div className="py-24 text-center text-[#6e6961]">{content.products.emptyState}</div>}
+            </>
+          )}
         </div>
       </section>
 

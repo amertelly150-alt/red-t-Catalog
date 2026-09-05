@@ -6,6 +6,7 @@ const router: IRouter = Router();
 
 router.get('/catalog', async (_req, res): Promise<void> => {
   const catalog = await getCatalog();
+  res.set('Cache-Control', 'no-store, max-age=0');
   res.json(GetCatalogResponse.parse(catalog));
 });
 
