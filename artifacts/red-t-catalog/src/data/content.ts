@@ -10,17 +10,17 @@ export const content = {
     { label: 'تواصل معنا', href: '#contact' },
   ],
   hero: {
-    eyebrow: 'EST. 2024 / RIYADH',
+    eyebrow: 'EST. 2024 / ALEPPO',
     headline: defaultSiteSettings.heroHeadline,
-    description: defaultSiteSettings.heroDescription,
-    image: defaultSiteSettings.heroImage,
+    description: 'قطع مختارة ومصممة خصيصا لتناسب ذوقك ، كل زبون هو شريكنا الأساسي في الصناعة والتغيير ، فقط عليك التخيل وعلينا التنفيذ',
+    image: '/hero-new.jpeg',
     ctaText: 'تصفح المنتجات',
     scrollLabel: 'SCROLL TO EXPLORE',
   },
   story: {
     eyebrow: '01 / THE POINT OF VIEW',
-    title: 'نصنع الأشياء التي تتحمل القصة.',
-    description: 'red-t ليست مجموعة أخرى معلقة في الخزانة. هي امتداد لطريقتك في الحركة — خامات صادقة، تصميم نظيف، وحضور لا يحتاج إلى شرح.',
+    title: 'اشياء بتشبهك ، صنعت لتبقى.',
+    description: 'تصاميم مميزة، تفاصيل مصنوعة بعناية، وقطع بتضيف لمستك الخاصة.',
     linkText: 'شاهد ما وصل حديثاً',
   },
   trending: {
@@ -42,22 +42,21 @@ export const content = {
   products: {
     eyebrow: '05 / THE FULL CATALOG',
     title: 'كل المنتجات',
-    description: 'قطع اختارها الطريق. تصفح المجموعة حسب مزاجك.',
+    description: ' تصفح المجموعة حسب مزاجك.',
     filterLabel: 'تصنيف المنتجات',
     emptyState: 'لا توجد قطع في هذا التصنيف حالياً.',
   },
   contact: {
     eyebrow: '04 / MAKE CONTACT',
-    title: ['لقيت اللي بدك ياه؟', 'تبدأ برسالة.'],
-    description: 'تواصل معنا واطلب منتجك مباشرة. نرد عليك بتفاصيل التوفر، المقاس، وطرق التوصيل.',
-    note: '* رقم واتساب تجريبي قابل للتعديل لاحقاً',
+    title: ['لقيت اللي بدك ياه؟', 'شو منتظر؟'],
+    description: 'تواصل معنا عالوتس واطلب منتجك مباشرة. رح نرد عليك بكل التفاصيل ، وطرق التوصيل.',
   },
   footer: {
     statement: 'منتجات مميزة بتصميم مختلف.',
     copyright: '© 2024 RED-T STUDIO',
     closing: 'صُنع للحركة، لا للعرض فقط.',
   },
-  tickerText: 'BUILT FOR THE LONG WAY',
+  tickerText: 'BUILT TO MAKE TRACE',
   whatsapp: {
     productButton: 'اطلب عبر واتساب',
     genericButton: 'تواصل معنا عبر واتساب',
@@ -68,4 +67,4 @@ export const content = {
 } as const;
 
 // Change this one value only. Keep the country code and remove spaces or symbols.
-export const WHATSAPP_NUMBER = defaultSiteSettings.whatsappNumber;
+export const WHATSAPP_NUMBER = '963986974853';defaultSiteSettings.whatsappNumber;

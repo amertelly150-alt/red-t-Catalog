@@ -155,7 +155,7 @@ function Home() {
         <div className="hero-grid absolute inset-0 opacity-50" />
         <div className="absolute -left-16 top-24 h-[420px] w-[420px] rounded-full bg-[#d20b18]/20 blur-[100px]" />
         <div className="absolute inset-0 opacity-50 lg:right-[47%]">
-            <img src={content.hero.image} alt="سيارة في مشهد حضري ليلي" fetchPriority="high" className="h-full w-full object-cover object-center mix-blend-screen opacity-60" />
+            <img src={content.hero.image} alt="صورة الواجهة الرئيسية" fetchPriority="high" className="..." />
         </div>
         <div className="relative mx-auto flex min-h-[700px] max-w-[1320px] items-end px-5 pb-14 pt-28 sm:px-8 lg:min-h-[790px] lg:px-12 lg:pb-20">
           <div className="relative z-10 max-w-[740px]">
@@ -166,7 +166,7 @@ function Home() {
               <span className="h-[1px] w-12 bg-[#d20b18]" />
               <span className="font-mono text-[10px] tracking-[.16em] text-[#f2efe8]/65">{content.hero.eyebrow}</span>
             </div>
-            <h1 className="reveal reveal-delay-1 display-tight font-display text-[70px] font-bold sm:text-[110px] lg:text-[155px]">
+            <h1 className="reveal reveal-delay-1 display-tight space-y-2 font-display text-[70px] font-bold sm:space-y-3 sm:text-[110px] lg:text-[155px]">
               <span className="block">{content.hero.headline[0]}</span>
               <span className="block text-[#d20b18]">{content.hero.headline[1]}</span>
             </h1>
@@ -299,7 +299,7 @@ function Home() {
         <div className="relative mx-auto grid max-w-[1320px] gap-12 lg:grid-cols-[1fr_auto] lg:items-end" dir="rtl">
           <div>
             <span className="font-mono text-[10px] tracking-[.18em] text-[#171516]/65">{content.contact.eyebrow}</span>
-            <h2 className="mt-6 max-w-[750px] text-[48px] font-semibold leading-[1.05] tracking-[-.06em] sm:text-[76px]">{content.contact.title[0]}<br /><span className="text-[#171516]">{content.contact.title[1]}</span></h2>
+            <h2 className="mt-6 max-w-[750px] text-[48px] font-semibold leading-[1.2] tracking-[-.06em] sm:text-[76px]">{content.contact.title[0]}<br /><span className="text-[#171516]">{content.contact.title[1]}</span></h2>
             <p className="mt-8 max-w-[390px] text-[15px] leading-8 text-[#f2efe8]/75">{content.contact.description}</p>
           </div>
           <div className="flex flex-col items-start gap-4">
@@ -318,7 +318,7 @@ function Home() {
               <a href="#story" className="hover:text-[#d20b18]" data-testid="link-footer-about">عن red-t</a>
               <a href="#contact" className="hover:text-[#d20b18]" data-testid="link-footer-contact">تواصل معنا</a>
               <a href={whatsappHref()} target="_blank" rel="noreferrer" className="hover:text-[#d20b18]" data-testid="link-footer-whatsapp">واتساب</a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#d20b18]" data-testid="link-footer-instagram">إنستغرام</a>
+              <a href="https://www.instagram.com/red_t44?stkn=MWw1ZHJwYWxmcG5jNQ=="target="_blank" rel="noreferrer" className="hover:text-[#d20b18]" data-testid="link-footer-instagram">إنستغرام</a>
             </div>
           </div>
           <div className="flex flex-col justify-between gap-3 pt-6 font-mono text-[9px] tracking-[.1em] text-[#f2efe8]/35 sm:flex-row"><span dir="ltr">{content.footer.copyright}</span><span>{content.footer.closing}</span></div>

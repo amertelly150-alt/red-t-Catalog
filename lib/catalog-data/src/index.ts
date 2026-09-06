@@ -218,7 +218,7 @@ export const products: readonly Product[] = [
 
 export const defaultSiteSettings: SiteSettings = {
   heroImage: '/images/hero/hero-main.jpg',
-  heroHeadline: ['اكتشف منتجاتك', 'المفضلة.'],
+  heroHeadline: ['كل ما تراه عينيك', 'صناعة سورية'],
   heroDescription: 'قطع مختارة لمن يعيشون التفاصيل. ملابس، إكسسوارات، وأساسيات ترافقك من أول تشغيل إلى آخر محطة.',
   whatsappNumber: '966500000000',
 };
