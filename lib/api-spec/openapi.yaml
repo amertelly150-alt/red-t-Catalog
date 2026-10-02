@@ -40,6 +40,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CatalogResponse"
+  /catalog/images/{id}/{version}:
+    get:
+      operationId: getCatalogProductImage
+      tags: [catalog]
+      summary: Get a product image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: version
+          in: path
+          required: true
+          description: Product image revision, used for safe long-term browser caching.
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Product image bytes
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Product image not found or revision is stale
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/session:
     get:
       operationId: getAdminSession

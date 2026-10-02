@@ -215,6 +215,88 @@ export function useGetCatalog<TData = Awaited<ReturnType<typeof getCatalog>>, TE
 
 
 
+export const getGetCatalogProductImageUrl = (id: number,
+    version: number,) => {
+
+
+
+
+  return `/api/catalog/images/${id}/${version}`
+}
+
+/**
+ * @summary Get a product image
+ */
+export const getCatalogProductImage = async (id: number,
+    version: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetCatalogProductImageUrl(id,version),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCatalogProductImageQueryKey = (id: number,
+    version: number,) => {
+    return [
+    `/api/catalog/images/${id}/${version}`
+    ] as const;
+    }
+
+
+export const getGetCatalogProductImageQueryOptions = <TData = Awaited<ReturnType<typeof getCatalogProductImage>>, TError = ErrorType<ErrorResponse>>(id: number,
+    version: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCatalogProductImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCatalogProductImageQueryKey(id,version);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCatalogProductImage>>> = ({ signal }) => getCatalogProductImage(id,version, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && version !== null && version !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCatalogProductImage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCatalogProductImageQueryResult = NonNullable<Awaited<ReturnType<typeof getCatalogProductImage>>>
+export type GetCatalogProductImageQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a product image
+ */
+
+export function useGetCatalogProductImage<TData = Awaited<ReturnType<typeof getCatalogProductImage>>, TError = ErrorType<ErrorResponse>>(
+ id: number,
+    version: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCatalogProductImage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCatalogProductImageQueryOptions(id,version,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getGetAdminSessionUrl = () => {
 
 

@@ -59,6 +59,17 @@ export const GetCatalogResponse = zod.object({
 
 
 /**
+ * @summary Get a product image
+ */
+export const GetCatalogProductImageParams = zod.object({
+  "id": zod.coerce.number(),
+  "version": zod.coerce.number().describe('Product image revision, used for safe long-term browser caching.')
+})
+
+export const GetCatalogProductImageResponse = zod.unknown()
+
+
+/**
  * @summary Check the admin session
  */
 export const GetAdminSessionResponse = zod.object({

@@ -99,6 +99,58 @@ export async function getCatalog(): Promise<CatalogResponse> {
   };
 }
 
+export async function getPublicCatalog(): Promise<CatalogResponse> {
+  await ensureCatalogSeeded();
+  const [productRows, categoryRows, settingsRows] = await Promise.all([
+    db.select().from(catalogProductsTable).orderBy(asc(catalogProductsTable.id)),
+    db.select().from(catalogCategoriesTable).orderBy(asc(catalogCategoriesTable.sortOrder), asc(catalogCategoriesTable.id)),
+    db.select().from(catalogSiteSettingsTable).limit(1),
+  ]);
+
+  const settings = settingsRows[0];
+  if (!settings) throw new Error('Catalog site settings are missing.');
+
+  const categories: Category[] = categoryRows.map((row) => ({
+    name: row.name,
+    subcategories: row.subcategories,
+  }));
+
+  return {
+    products: productRows.map((row) => {
+      const product = toProduct(row);
+      if (product.image.startsWith('data:image/')) {
+        product.image = `/api/catalog/images/${row.id}/${row.updatedAt.getTime()}`;
+      }
+      return product;
+    }),
+    categories,
+    site: {
+      heroImage: settings.heroImage,
+      heroHeadline: settings.heroHeadline,
+      heroDescription: settings.heroDescription,
+      whatsappNumber: settings.whatsappNumber,
+    },
+  };
+}
+
+export async function getCatalogProductImage(id: number): Promise<{ contentType: string; bytes: Buffer; version: number } | undefined> {
+  await ensureCatalogSeeded();
+  const [row] = await db
+    .select({ image: catalogProductsTable.image, updatedAt: catalogProductsTable.updatedAt })
+    .from(catalogProductsTable)
+    .where(eq(catalogProductsTable.id, id));
+  if (!row) return undefined;
+
+  const match = /^data:(image\/(?:png|jpeg|jpg|webp|gif));base64,([A-Za-z0-9+/=]+)$/.exec(row.image);
+  if (!match) return undefined;
+  const contentType = match[1] === 'image/jpg' ? 'image/jpeg' : match[1];
+  return {
+    contentType,
+    bytes: Buffer.from(match[2], 'base64'),
+    version: row.updatedAt.getTime(),
+  };
+}
+
 export async function getNextProductId(): Promise<number> {
   const result = await db.select({ maxId: sql<number>`coalesce(max(${catalogProductsTable.id}), 0)` }).from(catalogProductsTable);
   return Number(result[0]?.maxId ?? 0) + 1;

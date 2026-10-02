@@ -35,7 +35,7 @@
 - Public storefront and `/admin` remain one web artifact; there is no customer-facing admin link.
 - Catalog data is stored in PostgreSQL and seeded once from the shared demo data on first access.
 - Admin sessions use an HMAC-signed, HttpOnly cookie with the existing `SESSION_SECRET`; credentials are environment secrets.
-- Uploaded images are compressed in the browser and stored as data URLs in PostgreSQL to remain deploy-safe without filesystem persistence.
+- Uploaded images are compressed in the browser and stored as data URLs in PostgreSQL to remain deploy-safe without filesystem persistence. The public catalog returns versioned image URLs and serves image bytes separately, so product text loads without waiting for every image and browser caching remains safe after edits.
 - The public storefront reads products and categories from the live PostgreSQL-backed API only; it shows a loading/empty state instead of masking API failures with stale product data. The catalog query disables browser caching and refreshes on focus/reconnect and every five seconds while open.
 
 ## Product

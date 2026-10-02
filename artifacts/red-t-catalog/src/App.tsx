@@ -304,7 +304,6 @@ function Home() {
           </div>
           <div className="flex flex-col items-start gap-4">
              <WhatsAppButton dark whatsappNumber={liveWhatsappNumber} />
-            <span className="font-mono text-[9px] tracking-wide text-[#171516]/60">{content.contact.note}</span>
           </div>
         </div>
       </section>
